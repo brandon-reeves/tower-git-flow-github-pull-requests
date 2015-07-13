@@ -260,6 +260,8 @@ _finish_base() {
 		require_branches_equal "$BASE_BRANCH" "$ORIGIN/$BASE_BRANCH"
 	fi
 
+	cmd_publish "$NAME"
+
 	if noflag notag; then
 		# We ask for a tag, be sure it does not exists or
 		# points to the latest hotfix commit
@@ -321,12 +323,6 @@ _finish_base() {
 
 	git_do checkout "$BASE_BRANCH" || die "Could not check out branch '$BASE_BRANCH'."
 	run_post_hook "$VERSION_PREFIX$VERSION" "$ORIGIN" "$BRANCH"
-
-	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
-		echo "";
-	else
-		cmd_publish "$NAME"
-	fi
 
 	# # Delete branch
 	# if noflag keep; then
@@ -688,7 +684,7 @@ S,[no]squash        Squash release during merge
 		_finish_base
 	fi
 
-	PUSH_URL=$(git remote show origin | grep Push | grep -oh "github.com\/.*" | sed "s/\.git//g");
+	PUSH_URL=$(git remote show origin | grep Push | grep -oh "github.com[\/:].*" | sed "s/github\.com\:/github.com\//g" |sed "s/\.git//g");
 	COMPARE_URL="https://$PUSH_URL/compare/$BASE_BRANCH...$BRANCH?expand=1";
 	open $COMPARE_URL;
 }

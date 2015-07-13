@@ -404,6 +404,8 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 			require_branches_equal "$DEVELOP_BRANCH" "$ORIGIN/$DEVELOP_BRANCH"
 		fi
 	fi
+	
+	cmd_publish "$NAME"
 
 	# If the branch is already merged there is no need to check the hotfix branch
 	# This can happen when the merge in develop fails and we rerun the finish.
@@ -504,13 +506,7 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 	git_do checkout "$BASE_BRANCH" || die "Could not check out branch '$BASE_BRANCH'."
 	run_post_hook "$VERSION_PREFIX$VERSION" "$ORIGIN" "$BRANCH"
 
-	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
-		echo "";
-	else
-		cmd_publish "$NAME"
-	fi
-
-	PUSH_URL=$(git remote show origin | grep Push | grep -oh "github.com\/.*" | sed "s/\.git//g");
+	PUSH_URL=$(git remote show origin | grep Push | grep -oh "github.com[\/:].*" | sed "s/github\.com\:/github.com\//g" |sed "s/\.git//g");
 	COMPARE_URL="https://$PUSH_URL/compare/$BASE_BRANCH...$BRANCH?expand=1";
 	open $COMPARE_URL;
 
