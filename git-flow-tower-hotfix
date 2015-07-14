@@ -381,6 +381,8 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 	# merged into the local branch
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
 		git_fetch_branch "$ORIGIN" "$BRANCH"
+	else
+		cmd_publish "$NAME"
 	fi
 
 	# Update local branches with remote branches
@@ -389,11 +391,11 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 		[ "$BASE_BRANCH" = "$MASTER_BRANCH" ] && git_fetch_branch "$ORIGIN" "$DEVELOP_BRANCH"
 	fi
 
+	git_do push "$ORIGIN" :"$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
+
 	# Check if the local branches have all the commits from the remote branches
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
 		require_branches_equal "$BRANCH" "$ORIGIN/$BRANCH"
-	# else
-	# 	cmd_publish "$NAME"
 	fi
 
 	if git_remote_branch_exists "$ORIGIN/$BASE_BRANCH"; then
@@ -404,8 +406,6 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 			require_branches_equal "$DEVELOP_BRANCH" "$ORIGIN/$DEVELOP_BRANCH"
 		fi
 	fi
-	
-	cmd_publish "$NAME"
 
 	# If the branch is already merged there is no need to check the hotfix branch
 	# This can happen when the merge in develop fails and we rerun the finish.

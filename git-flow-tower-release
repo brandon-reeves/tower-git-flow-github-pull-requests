@@ -51,6 +51,8 @@ _finish_from_develop() {
 		git_fetch_branch "$ORIGIN" "$DEVELOP_BRANCH"
 	fi
 
+	git_do push "$ORIGIN" :"$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
+
 	# Check if the local branches have all the commits from the remote branches
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
 		require_branches_equal "$BRANCH" "$ORIGIN/$BRANCH"
@@ -147,13 +149,7 @@ _finish_from_develop() {
 
 	git_do checkout "$BASE_BRANCH" || die "Could not check out branch '$BASE_BRANCH'."
 	run_post_hook "$VERSION_PREFIX$VERSION" "$ORIGIN" "$BRANCH"
-
-	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
-		echo "";
-	else
-		cmd_publish "$NAME"
-	fi
-
+	
 	# # Delete branch
 	# if noflag keep; then
 
@@ -250,6 +246,8 @@ _finish_base() {
 		git_fetch_branch "$ORIGIN" "$BASE_BRANCH"
 	fi
 
+	git_do push "$ORIGIN" :"$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
+
 	# Check if the local branches have all the commits from the remote branches
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
 		require_branches_equal "$BRANCH" "$ORIGIN/$BRANCH"
@@ -259,8 +257,6 @@ _finish_base() {
 	if git_remote_branch_exists "$ORIGIN/$BASE_BRANCH"; then
 		require_branches_equal "$BASE_BRANCH" "$ORIGIN/$BASE_BRANCH"
 	fi
-
-	cmd_publish "$NAME"
 
 	if noflag notag; then
 		# We ask for a tag, be sure it does not exists or
@@ -676,6 +672,8 @@ S,[no]squash        Squash release during merge
 	# merged into the local branch
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
 			git_fetch_branch "$ORIGIN" "$BRANCH"
+	else
+		cmd_publish "$NAME"
 	fi
 
 	if [ "$BASE_BRANCH" = "$DEVELOP_BRANCH" ]; then
