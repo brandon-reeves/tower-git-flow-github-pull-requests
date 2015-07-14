@@ -391,7 +391,7 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 		[ "$BASE_BRANCH" = "$MASTER_BRANCH" ] && git_fetch_branch "$ORIGIN" "$DEVELOP_BRANCH"
 	fi
 
-	git_do push "$ORIGIN" :"$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
+	git_do push "$ORIGIN" "$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
 
 	# Check if the local branches have all the commits from the remote branches
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then

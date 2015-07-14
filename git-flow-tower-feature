@@ -344,8 +344,8 @@ no-ff!                 Never fast-forward during the merge
 	if flag fetch; then
 		git_fetch_branch "$ORIGIN" "$BASE_BRANCH"
 	fi
-	
-	git_do push "$ORIGIN" :"$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
+
+	git_do push "$ORIGIN" "$BRANCH" || die "Could not push the $BRANCH to $ORIGIN."
 
 	# Check if the local branches have all the commits from the remote branches
 	if git_remote_branch_exists "$ORIGIN/$BRANCH"; then
