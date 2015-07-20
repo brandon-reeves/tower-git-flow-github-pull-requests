@@ -471,37 +471,40 @@ b,[no]nobackmerge     Don't back-merge master, or tag if applicable, in develop
 		fi
 	fi
 
-	# if [ "$BASE_BRANCH" = "$MASTER_BRANCH" ]; then
-	# 	# By default we back-merge the $MASTER_BRANCH unless the user explicitly
-	# 	# stated not to do a back-merge, in that case we use the $BRANCH.
-	# 	if noflag nobackmerge; then
-	# 		MERGE_BRANCH="$BASE_BRANCH"
-	# 	else
-	# 		MERGE_BRANCH="$BRANCH"
-	# 	fi
+	if [ "$BASE_BRANCH" = "$MASTER_BRANCH" ]; then
+		# By default we back-merge the $MASTER_BRANCH unless the user explicitly
+		# stated not to do a back-merge, in that case we use the $BRANCH.
+		# if noflag nobackmerge; then
+		# 	MERGE_BRANCH="$BASE_BRANCH"
+		# else
+		# 	MERGE_BRANCH="$BRANCH"
+		# fi
 
-	# 	# Try to merge into develop.
-	# 	# In case a previous attempt to finish this release branch has failed,
-	# 	# but the merge into develop was successful, we skip it now
-	# 	if ! git_is_branch_merged_into "$MERGE_BRANCH" "$DEVELOP_BRANCH"; then
-	# 		git_do checkout "$DEVELOP_BRANCH" || die "Could not check out branch '$DEVELOP_BRANCH'."
+		# Try to merge into develop.
+		# In case a previous attempt to finish this release branch has failed,
+		# but the merge into develop was successful, we skip it now
+		if ! git_is_branch_merged_into "$MERGE_BRANCH" "$DEVELOP_BRANCH"; then
+			git_do checkout "$DEVELOP_BRANCH" || die "Could not check out branch '$DEVELOP_BRANCH'."
 
-	# 		if noflag nobackmerge; then
-	# 			# Accounting for 'git describe', if a release is tagged
-	# 			# we use the tag commit instead of the branch.
-	# 			if noflag notag; then
-	# 				commit="$VERSION_PREFIX$VERSION"
-	# 			else
-	# 				commit="$BASE_BRANCH"
-	# 			fi
-	# 		else
-	# 			commit="$BRANCH"
-	# 		fi
+			# if noflag nobackmerge; then
+			# 	# Accounting for 'git describe', if a release is tagged
+			# 	# we use the tag commit instead of the branch.
+			# 	if noflag notag; then
+			# 		commit="$VERSION_PREFIX$VERSION"
+			# 	else
+			# 		commit="$BASE_BRANCH"
+			# 	fi
+			# else
+			# 	commit="$BRANCH"
+			# fi
 
-	# 		git_do merge --no-ff "$commit" || die "There were merge conflicts."
-	# 		# TODO: What do we do now?
-	# 	fi
-	# fi
+			# git_do merge --no-ff "$commit" || die "There were merge conflicts."
+			# TODO: What do we do now?
+			PUSH_URL=$(git remote show origin | grep Push | grep -oh "github.com[\/:].*" | sed "s/github\.com\:/github.com\//g" |sed "s/\.git//g");
+			COMPARE_URL="https://$PUSH_URL/compare/$DEVELOP_BRANCH...$BRANCH?expand=1";
+			open $COMPARE_URL;
+		fi
+	fi
 
 	git_do checkout "$BASE_BRANCH" || die "Could not check out branch '$BASE_BRANCH'."
 	run_post_hook "$VERSION_PREFIX$VERSION" "$ORIGIN" "$BRANCH"
